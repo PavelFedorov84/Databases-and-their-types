@@ -16,7 +16,6 @@ kubectl port-forward service/web-app 8080:80
 
 ### Задание 2
 
-
 ```
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \ -keyout tls.key -out tls.crt -subj "/CN=myapp.example.com"
 nano secret-tls.yaml
@@ -31,6 +30,16 @@ curl -k https://localhost:8443 -H "Host: myapp.example.com"
 <img width="648" height="212" alt="image" src="https://github.com/user-attachments/assets/605cf718-5db3-4d80-b9fd-e5a67f95ec80" />
 
 ### Задание 3
-```
 
 ```
+openssl genrsa -out developer.key 2048
+openssl req -new -key developer.key -out developer.csr -subj "/CN=developer"
+minikube ssh "sudo cat /var/lib/minikube/certs/ca.crt" > ca.crt
+minikube ssh "sudo cat /var/lib/minikube/certs/ca.key" > ca.key
+openssl x509 -req -in developer.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out developer.crt -days 365
+nano role-pod-reader.yaml
+nano rolebinding-developer.yaml
+kubectl apply -f role-pod-reader.yaml
+kubectl apply -f rolebinding-developer.yaml
+```
+<img width="664" height="272" alt="image" src="https://github.com/user-attachments/assets/0df6f938-0df5-4ae4-8b7b-ee245bf8359b" />
